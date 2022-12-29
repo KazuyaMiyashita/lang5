@@ -36,6 +36,11 @@ class EasyMachine(val program: Array[Operation]) {
   private def getReturnAddr(): Int = {
     stack(framePtr + 2)
   }
+
+  private def getArgc(): Int = {
+    stack(framePtr)
+  }
+
   private def getArgument(index: Int): Int = {
     stack(framePtr + index)
   }
@@ -61,7 +66,9 @@ class EasyMachine(val program: Array[Operation]) {
           case v: Value => throw new Exception(s"Expecting to have an opcode, but has a value: $v")
           case InvokeVirtual =>
             val jumpAddr = read().asInstanceOf[ProgramAddress].asInt
-            val returnAddr = programCounter // InvokeVirtual の次にはジャンプ先が一つ設定されている。関数を抜けた後にread()が先に呼ばれて次のアドレスになる
+            val argc = read().asInstanceOf[Value].asInt
+            push(argc)
+            val returnAddr = programCounter // InvokeVirtual の次の次にはジャンプ先が一つ設定されている。関数を抜けた後にread()が先に呼ばれて次のアドレスになる
             push(returnAddr)
             framePtr = stackPtr - 3 // FIXME returnAddr1個分, 引数2個分
             programCounter = jumpAddr
