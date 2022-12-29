@@ -155,13 +155,20 @@ class EasyMachine2 {
       while (true) {
         read() match {
           case `nop`          => ()
+          case `iconst_0`     => _bipush(0)
           case `iconst_1`     => _bipush(1)
+          case `iconst_2`     => _bipush(2)
+          case `iconst_3`     => _bipush(3)
+          case `iconst_4`     => _bipush(4)
+          case `iconst_5`     => _bipush(5)
           case `iload_0`      => _iload(0)
           case `iload_1`      => _iload(1)
           case `iload_2`      => _iload(2)
+          case `iload_3`      => _iload(3)
           case `istore_0`     => _istore(0)
           case `istore_1`     => _istore(1)
           case `istore_2`     => _istore(2)
+          case `istore_3`     => _istore(3)
           case `bipush`       => _bipush(read())
           case `iadd`         => _iadd()
           case `imul`         => _imul()
@@ -185,13 +192,20 @@ object EasyMachine2 {
 
   object Operations {
     val nop: Byte = 0x00
+    val iconst_0: Byte = 0x03
     val iconst_1: Byte = 0x04
+    val iconst_2: Byte = 0x05
+    val iconst_3: Byte = 0x06
+    val iconst_4: Byte = 0x07
+    val iconst_5: Byte = 0x08
     val iload_0: Byte = 0x1a
     val iload_1: Byte = 0x1b
     val iload_2: Byte = 0x1c
+    val iload_3: Byte = 0x1d
     val istore_0: Byte = 0x3b
     val istore_1: Byte = 0x3c
     val istore_2: Byte = 0x3d
+    val istore_3: Byte = 0x3e
     val bipush: Byte = 0x10
     val iadd: Byte = 0x60
     val imul: Byte = 0x68

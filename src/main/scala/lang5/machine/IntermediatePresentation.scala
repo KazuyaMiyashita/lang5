@@ -57,19 +57,23 @@ object IntermediatePresentation {
     }
 
     object Operation {
+
+      object Iconst_0 extends Operation(Operations.iconst_0, "iconst_0")
       object Iconst_1 extends Operation(Operations.iconst_1, "iconst_1")
+      object Iconst_2 extends Operation(Operations.iconst_2, "iconst_2")
+      object Iconst_3 extends Operation(Operations.iconst_3, "iconst_3")
+      object Iconst_4 extends Operation(Operations.iconst_4, "iconst_4")
+      object Iconst_5 extends Operation(Operations.iconst_5, "iconst_5")
 
       object Iload_0 extends Operation(Operations.iload_0, "iload_0")
-
       object Iload_1 extends Operation(Operations.iload_1, "iload_1")
-
       object Iload_2 extends Operation(Operations.iload_2, "iload_2")
+      object Iload_3 extends Operation(Operations.iload_3, "iload_3")
 
       object Istore_0 extends Operation(Operations.istore_0, "istore_0")
-
       object Istore_1 extends Operation(Operations.istore_1, "istore_1")
-
       object Istore_2 extends Operation(Operations.istore_2, "istore_2")
+      object Istore_3 extends Operation(Operations.istore_3, "istore_3")
 
       object Bipush extends Operation(Operations.bipush, "bipush")
 
