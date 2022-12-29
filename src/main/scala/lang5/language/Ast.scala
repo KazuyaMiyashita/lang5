@@ -27,7 +27,7 @@ object Ast {
   final case class WhileExpression(condition: Expression, body: Expression) extends Expression
 
   final case class IfExpression(condition: Expression, thenClause: Expression, elseClause: Option[Expression])
-    extends Expression
+      extends Expression
 
   final case class FunctionCall(name: String, args: List[Expression]) extends Expression
 
@@ -98,5 +98,5 @@ object Ast {
 
   def globalVarDef(name: String, expression: Expression): GlobalVariableDefinition =
     GlobalVariableDefinition(name, expression)
-  
+
 }
