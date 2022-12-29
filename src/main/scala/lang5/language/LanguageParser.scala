@@ -9,82 +9,71 @@ import scala.annotation.tailrec
 object LanguageParser extends Parser[Program] {
 
   def programParser: Parser[Program] =
-    zeroOrMoreWithout(spaces)(topLevelDefinitionParser).map(topLevels => Program(topLevels))
-
-  def topLevelDefinitionParser: Parser[TopLevel] =
-    orderedChoice(globalVariableDefinitionParser, functionDefinitionParser)
-
-  def globalVariableDefinitionParser: Parser[GlobalVariableDefinition] =
-    sequenceWithout(spaces)(
-      atomic("global"),
-      identifierStringParser,
-      atomic("="),
-      expressionParser
-    ).map { (_, name, _, expression) =>
-      GlobalVariableDefinition(name, expression)
-    }
+    zeroOrMoreWithout(spaces)(functionDefinitionParser).map(topLevels => Program(topLevels))
 
   def functionDefinitionParser: Parser[FunctionDefinition] = sequenceWithout(spaces)(
-    atomic("define"),
+    atomic("function"),
     identifierStringParser,
     atomic("("),
     optional(
       sequenceWithout(spaces)(
         identifierStringParser,
-        zeroOrMore(sequence(atomic(","), identifierStringParser))
+        zeroOrMore(sequenceWithout(spaces)(atomic(","), identifierStringParser))
       )
     ),
     atomic(")"),
-    blockExpressionParser
-  ).map { (_, name, _, argsOpt, _, block) =>
+    atomic("{"),
+    oneOrMoreWithout(spaces)(lineParser),
+    atomic("}")
+  ).map { (_, name, _, argsOpt, _, _, expressions, _) =>
     val args = argsOpt match {
       case None    => Nil
       case Some(a) => a._1 :: a._2.map(_._2)
     }
-    FunctionDefinition(name, args, block)
+    FunctionDefinition(name, args, expressions._1 :: expressions._2)
   }
 
   def lineParser = orderedChoiceMulti(
-    whileExpressionParser,
-    ifExpressionParser,
+//    whileExpressionParser,
+//    ifExpressionParser,
     assignmentParser,
-    expressionLineParser,
-    blockExpressionParser
+    expressionParser
+//    blockExpressionParser
   )
 
-  def ifExpressionParser: Parser[IfExpression] = sequenceWithout(spaces)(
-    atomic("if"),
-    atomic("("),
-    expressionParser,
-    atomic(")"),
-    lineParser,
-    optional(
-      sequenceWithout(spaces)(
-        atomic("else"),
-        lineParser
-      )
-    )
-  ).map { (_, _, condition, _, thenClause, _elseClause) =>
-    IfExpression(condition, thenClause, _elseClause.map(_._2))
-  }
+//  def ifExpressionParser: Parser[IfExpression] = sequenceWithout(spaces)(
+//    atomic("if"),
+//    atomic("("),
+//    expressionParser,
+//    atomic(")"),
+//    lineParser,
+//    optional(
+//      sequenceWithout(spaces)(
+//        atomic("else"),
+//        lineParser
+//      )
+//    )
+//  ).map { (_, _, condition, _, thenClause, _elseClause) =>
+//    IfExpression(condition, thenClause, _elseClause.map(_._2))
+//  }
+//
+//  def whileExpressionParser: Parser[WhileExpression] = sequenceWithout(spaces)(
+//    atomic("while"),
+//    atomic("("),
+//    expressionParser,
+//    atomic(")"),
+//    lineParser
+//  ).map { (_, _, condition, _, body) =>
+//    WhileExpression(condition, body)
+//  }
 
-  def whileExpressionParser: Parser[WhileExpression] = sequenceWithout(spaces)(
-    atomic("while"),
-    atomic("("),
-    expressionParser,
-    atomic(")"),
-    lineParser
-  ).map { (_, _, condition, _, body) =>
-    WhileExpression(condition, body)
-  }
-
-  def blockExpressionParser: Parser[BlockExpression] = sequenceWithout(spaces)(
-    atomic("{"),
-    zeroOrMoreWithout(spaces)(expressionParser),
-    atomic("}")
-  ).map { case (_, elements, _) =>
-    BlockExpression(elements)
-  }
+//  def blockExpressionParser: Parser[BlockExpression] = sequenceWithout(spaces)(
+//    atomic("{"),
+//    zeroOrMoreWithout(spaces)(expressionParser),
+//    atomic("}")
+//  ).map { case (_, elements, _) =>
+//    BlockExpression(elements)
+//  }
 
   def assignmentParser: Parser[Assignment] = sequenceWithout(spaces)(
     identifierStringParser,
@@ -100,7 +89,10 @@ object LanguageParser extends Parser[Program] {
     atomic(";")
   ).map(_._1)
 
-  def expressionParser: Parser[Expression] = comparativeParser
+  def expressionParser: Parser[Expression] = {
+//    comparativeParser
+    additiveParser
+  }
 
   @tailrec
   def listToTree(head: Expression, tail: List[(Operator, Expression)]): Expression = {
@@ -110,24 +102,24 @@ object LanguageParser extends Parser[Program] {
     }
   }
 
-  def comparativeParser: Parser[Expression] = {
-    sequenceWithout(spaces)(
-      additiveParser,
-      zeroOrMoreWithout(spaces)(
-        sequenceWithout(spaces)(
-          orderedChoiceMulti(
-            atomic("<").map(_ => Operator.LessThan),
-            atomic(">").map(_ => Operator.GreaterThan),
-            atomic("<=").map(_ => Operator.LessOrEqual),
-            atomic(">=").map(_ => Operator.GreaterOrEqual),
-            atomic("==").map(_ => Operator.Equal),
-            atomic("!=").map(_ => Operator.NotEqual)
-          ),
-          additiveParser
-        )
-      )
-    ).map { (head, tail) => listToTree(head, tail) }
-  }
+//  def comparativeParser: Parser[Expression] = {
+//    sequenceWithout(spaces)(
+//      additiveParser,
+//      zeroOrMoreWithout(spaces)(
+//        sequenceWithout(spaces)(
+//          orderedChoiceMulti(
+//            atomic("<").map(_ => Operator.LessThan),
+//            atomic(">").map(_ => Operator.GreaterThan),
+//            atomic("<=").map(_ => Operator.LessOrEqual),
+//            atomic(">=").map(_ => Operator.GreaterOrEqual),
+//            atomic("==").map(_ => Operator.Equal),
+//            atomic("!=").map(_ => Operator.NotEqual)
+//          ),
+//          additiveParser
+//        )
+//      )
+//    ).map { (head, tail) => listToTree(head, tail) }
+//  }
 
   def additiveParser: Parser[Expression] =
     sequenceWithout(spaces)(
@@ -135,8 +127,8 @@ object LanguageParser extends Parser[Program] {
       zeroOrMoreWithout(spaces)(
         sequenceWithout(spaces)(
           orderedChoiceMulti(
-            atomic("+").map(_ => Operator.Add),
-            atomic("-").map(_ => Operator.Subtract)
+            atomic("+").map(_ => Operator.Add)
+//            atomic("-").map(_ => Operator.Subtract)
           ),
           multitiveParser
         )
@@ -149,8 +141,8 @@ object LanguageParser extends Parser[Program] {
       zeroOrMoreWithout(spaces)(
         sequenceWithout(spaces)(
           orderedChoiceMulti(
-            atomic("*").map(_ => Operator.Multiply),
-            atomic("/").map(_ => Operator.Divide)
+            atomic("*").map(_ => Operator.Multiply)
+//            atomic("/").map(_ => Operator.Divide)
           ),
           primaryParser
         )
@@ -203,6 +195,6 @@ object LanguageParser extends Parser[Program] {
     )
   ).map(_ => ())
 
-  override def parse(in: String): ParseResult[Program] = programParser.requireTerminal.parse(in)
+  override def parse(in: String): ParseResult[Program] = programParser.parseAll.parse(in)
 
 }

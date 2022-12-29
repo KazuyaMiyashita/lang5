@@ -1,6 +1,5 @@
 package lang5.machine
 
-
 // intermediate presentation
 
 import IntermediatePresentation.*
@@ -13,8 +12,8 @@ case class IntermediatePresentation(functionDefs: List[FunctionDef]) {
         val elemsWithIndex: List[(Elem, Int)] = elems zip accum(elems.map(_.bytes))
         val elemsString = elemsWithIndex.map { case (elem, index) =>
           elem match {
-            case _: Elem.Operation => s"\n  $index: ${elem.prettyName}"
-            case Elem.ConstValue(_) => s"  ${elem.prettyName}"
+            case _: Elem.Operation   => s"\n  $index: ${elem.prettyName}"
+            case Elem.ConstValue(_)  => s"  ${elem.prettyName}"
             case Elem.FunctionRef(_) => s"  ${elem.prettyName}"
           }
         }
@@ -33,7 +32,7 @@ case class IntermediatePresentation(functionDefs: List[FunctionDef]) {
         case Elem.FunctionRef(ref) =>
           val addrInt: Int = functionIndex(ref)
           (addrInt >>> 8).asInstanceOf[Byte] :: addrInt.asInstanceOf[Byte] :: Nil
-        case op: Elem.Operation => op.code :: Nil
+        case op: Elem.Operation    => op.code :: Nil
         case Elem.ConstValue(code) => code :: Nil
       }
     }.toArray
@@ -75,6 +74,8 @@ object IntermediatePresentation {
       object Bipush extends Operation(Operations.bipush, "bipush")
 
       object Iadd extends Operation(Operations.iadd, "iadd")
+
+      object Imul extends Operation(Operations.imul, "imul")
 
       object Ireturn extends Operation(Operations.ireturn, "ireturn")
 

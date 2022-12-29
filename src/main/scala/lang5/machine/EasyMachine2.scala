@@ -108,6 +108,10 @@ class EasyMachine2 {
     _pushInt(_popInt() + _popInt())
   }
 
+  private def _imul(): Unit = {
+    _pushInt(_popInt() * _popInt())
+  }
+
   private def _ireturn(): Unit = {
     val returnProgramAddr = _getReturnProgramAddress()
     val returnFramePointer = _getReturnFramePointer()
@@ -160,6 +164,7 @@ class EasyMachine2 {
           case `istore_2`     => _istore(2)
           case `bipush`       => _bipush(read())
           case `iadd`         => _iadd()
+          case `imul`         => _imul()
           case `ireturn`      => _ireturn(); if (programAddress == 0) b.break()
           case `invokestatic` => _invokestatic(read(), read())
         }
@@ -189,6 +194,7 @@ object EasyMachine2 {
     val istore_2: Byte = 0x3d
     val bipush: Byte = 0x10
     val iadd: Byte = 0x60
+    val imul: Byte = 0x68
     val ireturn: Byte = 0xac.asInstanceOf[Byte]
     val invokestatic: Byte = 0xb8.asInstanceOf[Byte]
   }

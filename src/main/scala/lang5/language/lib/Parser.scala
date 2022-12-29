@@ -11,7 +11,7 @@ trait Parser[+A] { self =>
   /** このパーサーによって終端することを要請する。すなわち消費できなかった文字列があると失敗とする
     * QUESTION: この実装は場当たり的ではないか？
     */
-  final def requireTerminal: Parser[A] = { (in: String) =>
+  final def parseAll: Parser[A] = { (in: String) =>
     self.parse(in).flatMap { s =>
       Either.cond(
         s.remaining.isEmpty,
@@ -221,6 +221,62 @@ object Parser {
         r7.result
       ),
       r7.remaining
+    )
+  }
+
+  final def sequence[A1, A2, A3, A4, A5, A6, A7, A8](
+      e1: => Parser[A1],
+      e2: => Parser[A2],
+      e3: => Parser[A3],
+      e4: => Parser[A4],
+      e5: => Parser[A5],
+      e6: => Parser[A6],
+      e7: => Parser[A7],
+      e8: => Parser[A8]
+  ): Parser[(A1, A2, A3, A4, A5, A6, A7, A8)] = { (in: String) =>
+    for {
+      r1 <- e1.parse(in)
+      r2 <- e2.parse(r1.remaining)
+      r3 <- e3.parse(r2.remaining)
+      r4 <- e4.parse(r3.remaining)
+      r5 <- e5.parse(r4.remaining)
+      r6 <- e6.parse(r5.remaining)
+      r7 <- e7.parse(r6.remaining)
+      r8 <- e8.parse(r7.remaining)
+    } yield ParseSucceed(
+      (
+        r1.result,
+        r2.result,
+        r3.result,
+        r4.result,
+        r5.result,
+        r6.result,
+        r7.result,
+        r8.result
+      ),
+      r8.remaining
+    )
+  }
+
+  final def sequenceWithout[A1, A2, A3, A4, A5, A6, A7, A8](delimiter: => Parser[_])(
+      e1: => Parser[A1],
+      e2: => Parser[A2],
+      e3: => Parser[A3],
+      e4: => Parser[A4],
+      e5: => Parser[A5],
+      e6: => Parser[A6],
+      e7: => Parser[A7],
+      e8: => Parser[A8]
+  ): Parser[(A1, A2, A3, A4, A5, A6, A7, A8)] = {
+    sequence(
+      dropRight(e1, delimiter),
+      dropRight(e2, delimiter),
+      dropRight(e3, delimiter),
+      dropRight(e4, delimiter),
+      dropRight(e5, delimiter),
+      dropRight(e6, delimiter),
+      dropRight(e7, delimiter),
+      e8
     )
   }
 
