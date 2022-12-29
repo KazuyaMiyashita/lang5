@@ -10,7 +10,6 @@ object Main extends App {
       |    c = add(a, b);
       |    c
       |}
-      |
       |function add(a, b) {
       |    a + b
       |}
