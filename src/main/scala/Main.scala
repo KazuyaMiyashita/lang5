@@ -41,9 +41,9 @@ object Main extends App {
   val machine = new EasyMachine2
   val program = ip.compile
   machine.load(program)
-  println("*** running... (argument is empty) ***")
+  println("*** running... (args = []) ***")
   machine.run(Array.emptyByteArray)
-  val result = machine.result(4)
+  val result = java.nio.ByteBuffer.allocate(4).put(machine.result(4)).getInt(0)
   println(s"*** run result ***")
-  println(s"${result.mkString("[", ",", "]")}")
+  println(result)
 }
