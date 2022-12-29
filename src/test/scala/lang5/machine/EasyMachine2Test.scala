@@ -1,10 +1,8 @@
 package lang5.machine
 
 import EasyMachine2.*
-import EasyMachine2.IntermediatePresentation.*
+import IntermediatePresentation.*
 import org.scalatest.funsuite.AnyFunSuite
-
-import java.nio.ByteBuffer
 
 class EasyMachine2Test extends AnyFunSuite {
 

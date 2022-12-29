@@ -1,9 +1,8 @@
 import lang5.language.{LanguageCompiler, LanguageParser}
-import lang5.machine.{Machine, MachineLanguage}
-import lang5.machine.Operations.*
+import lang5.machine.EasyMachine2
 
 object Main extends App {
-  val machine = new Machine
+  val machine = new EasyMachine2
 //  val source =
 //    """define main() {
 //      |  1
@@ -15,7 +14,7 @@ object Main extends App {
 //  val program = LanguageCompiler.compile(ast)
   val program = ???
   machine.load(program)
-  machine.run(0, new Array[Byte](0))
+  machine.run(Array.emptyByteArray)
   val result = machine.result(1)
   println(result.mkString)
 }
